@@ -153,8 +153,15 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                   {day.dayOfMonth}
                 </span>
                 
-                {/* 状态圆点 */}
-                <span className={`w-1.5 h-1.5 rounded-full ${dotStyle}`} />
+                <div className="flex items-center gap-1.5">
+                  {isToday && (
+                    <span className="text-[9px] font-bold text-indigo-600/95 tracking-wider leading-none">
+                      TODAY
+                    </span>
+                  )}
+                  {/* 状态圆点 */}
+                  <span className={`w-1.5 h-1.5 rounded-full ${dotStyle}`} />
+                </div>
               </div>
 
               {/* 移动端简洁标，网页端文字描述 */}
@@ -163,13 +170,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                   {labelText}
                 </p>
               </div>
-
-              {/* 今天标记 */}
-              {isToday && (
-                <div className="absolute top-1 right-3 text-[9px] font-bold text-indigo-600/90 tracking-wider">
-                  TODAY
-                </div>
-              )}
 
               {/* 用户自定义提示图标 */}
               {day.isCustom && (

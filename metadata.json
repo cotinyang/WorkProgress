@@ -1,0 +1,1 @@
+{"name":"工作时间进度","description":"一个高精度的进度条工具，显示当月剩余工作时间百分比，支持剔除周末及中国法定节假日与调休补班安排，支持一键自动同步最新节假日并支持自定义工作日。","requestFramePermissions":[],"majorCapabilities":["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]}

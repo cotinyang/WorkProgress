@@ -241,19 +241,19 @@ export default function App() {
   const hasOverrides = Object.keys(customOverrides).length > 0;
 
   return (
-    <div id="main-root-container" className="min-h-screen bg-slate-50/70 text-gray-800 font-sans tracking-tight pb-16 antialiased">
+    <div id="main-root-container" className="min-h-screen bg-slate-50/70 dark:bg-slate-950 text-gray-800 dark:text-slate-200 font-sans tracking-tight pb-16 antialiased">
       {/* 顶部通栏导航 */}
-      <header id="top-portal-header" className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-30 transition-all">
+      <header id="top-portal-header" className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800/80 z-30 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/10">
               <Calendar size={18} />
             </div>
             <div>
-              <h1 className="text-base font-bold text-gray-900 tracking-tight flex items-center gap-1.5 leading-none">
+              <h1 className="text-base font-bold text-gray-900 dark:text-slate-100 tracking-tight flex items-center gap-1.5 leading-none">
                 工作进度
               </h1>
-              <p className="text-[10px] text-gray-400 font-medium leading-none mt-1">
+              <p className="text-[10px] text-gray-400 dark:text-slate-500 font-medium leading-none mt-1">
                 剔除法定节假日 · 调休智能补偿 · 精确度万分之一
               </p>
             </div>
@@ -261,11 +261,11 @@ export default function App() {
 
           <div className="flex items-center gap-4">
             {/* 顶栏北京实时时间看板 */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100/80 rounded-xl">
-              <Clock size={13} className="text-gray-400" />
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100/80 dark:border-slate-800 rounded-xl">
+              <Clock size={13} className="text-gray-400 dark:text-slate-500" />
               <div className="flex flex-col text-left">
-                <span className="text-[9px] font-bold text-gray-400 leading-none">BEIJING TIME</span>
-                <span className="text-xs font-semibold text-gray-700 font-mono mt-0.5 leading-none">
+                <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 leading-none">BEIJING TIME</span>
+                <span className="text-xs font-semibold text-gray-700 dark:text-slate-300 font-mono mt-0.5 leading-none">
                   {currentTime.toLocaleTimeString("zh-CN", { hour12: false })}
                 </span>
               </div>

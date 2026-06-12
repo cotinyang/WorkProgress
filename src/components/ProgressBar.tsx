@@ -100,6 +100,16 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
           <span className="text-sm font-extrabold text-indigo-600 tracking-wider">USD</span>
         </div>
 
+        {/* 核心工作日及每日额度数据 */}
+        <div className="flex items-center gap-2.5 mt-3 flex-wrap">
+          <div className="bg-slate-50 border border-slate-100 rounded-xl px-2.5 py-1 text-[11px] font-bold text-gray-500">
+            工作日: <span className="font-mono text-gray-900">{progress.totalWorkDays}天</span>
+          </div>
+          <div className="bg-indigo-50/60 border border-indigo-100/50 rounded-xl px-2.5 py-1 text-[11px] font-bold text-indigo-800">
+            每天可用额度: <span className="font-mono text-indigo-950">${(1500 / progress.totalWorkDays).toFixed(2)} USD</span>
+          </div>
+        </div>
+
         <p className="text-xs text-gray-400 mt-3 leading-relaxed">
           工作时间：<strong className="text-gray-600 font-mono">09:00 - 18:00</strong>（午休 12:00 - 13:00）
           <br />

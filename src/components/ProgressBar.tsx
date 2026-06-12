@@ -90,7 +90,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
       <div className="flex flex-col items-center md:items-start text-center md:text-left py-4 px-6 md:border-l md:border-gray-100 min-w-[260px] md:pl-12">
         <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1.5 justify-center md:justify-start">
           <Wallet size={14} className="text-indigo-500" />
-          当月可消耗额度
+          当月可用额度
         </span>
         
         <div className="flex items-baseline gap-2 mt-1">
@@ -116,7 +116,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
         <div className="mt-4 flex items-center justify-between w-full text-[11px] font-medium text-indigo-800 bg-indigo-50/50 border border-indigo-100/50 px-3 py-2 rounded-xl">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-            今日下班后预计可消耗
+            今日下班后预计可用
           </span>
           <span className="font-bold tracking-tight">
             ${(1500 * progress.endOfDayProgressPercent / 100).toFixed(2)}

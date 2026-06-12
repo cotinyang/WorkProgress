@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { HolidayItem, WorkHoursConfig } from "./types";
 import { DEFAULT_HOLIDAYS_PRESET } from "./constants";
-import { generateMonthDays, calculateMonthProgress, formatDateStr } from "./utils";
+import { generateMonthDays, calculateMonthProgress, formatDateStr, translateHolidayName } from "./utils";
 import { CalendarGrid } from "./components/CalendarGrid";
 import { ProgressBar } from "./components/ProgressBar";
 import { Calendar, ChevronLeft, ChevronRight, RefreshCw, Layers, ShieldCheck, CheckSquare, Clock } from "lucide-react";
@@ -151,26 +151,24 @@ export default function App() {
     setSelectedMonth(now.getMonth() + 1);
   };
 
-  // 11. 手动点击日历盒子：一键切换工作日与休息日
+  // 11. Toggle workday and leave on cell click
   const handleToggleDay = (dateStr: string) => {
-    // 找出该天原本的排班
     const matchedDay = daysOfSelectedMonth.find(d => d.date === dateStr);
     if (!matchedDay) return;
 
     const currentlyIsWorkday = matchedDay.isWorkday;
 
-    // 翻转逻辑：如果以前是工作日，现在改成休息日；如果以前是休息日，现在改成工作日
     setCustomOverrides(current => {
       const updated = { ...current };
 
       if (updated[dateStr]) {
-        // 如果之前已经自定义覆盖过，删除它以返回到默认模式
+        // If already customized, delete override to return to default
         delete updated[dateStr];
       } else {
-        // 否则建立新覆写：翻转状态
+        // Otherwise, toggle states
         updated[dateStr] = {
-          isHoliday: currentlyIsWorkday, // 原来是工作日（isHoliday: false），现在变成节假日（isHoliday: true）
-          name: currentlyIsWorkday ? "手动调休休" : "手动调休班"
+          isHoliday: currentlyIsWorkday,
+          name: currentlyIsWorkday ? "Custom Leave" : "Custom Workday"
         };
       }
 
@@ -178,14 +176,14 @@ export default function App() {
     });
   };
 
-  // 12. 清除全部自定义微调
+  // 12. Reset all overrides
   const handleResetOverrides = () => {
-    if (confirm("确定要清空您在这个月（或全部时间）上手动修改的所有假期吗？")) {
+    if (confirm("Are you sure you want to clear all custom holiday/workday overrides?")) {
       setCustomOverrides({});
     }
   };
 
-  // 13. 调用 Timor.tech API 同步国家法定节假日
+  // 13. Call Timor.tech API to sync official holidays
   const handleSyncHolidays = async () => {
     setIsSyncing(true);
     setSyncError(null);
@@ -193,12 +191,12 @@ export default function App() {
     try {
       const response = await fetch(`https://timor.tech/api/holiday/year/${selectedYear}`);
       if (!response.ok) {
-        throw new Error(`服务器返回异常状态码: ${response.status}`);
+        throw new Error(`Server returned abnormal status code: ${response.status}`);
       }
       
       const payload = await response.json();
       if (payload.code !== 0) {
-        throw new Error(payload.msg || `API返回错误代码: ${payload.code}`);
+        throw new Error(payload.msg || `API returned error code: ${payload.code}`);
       }
 
       const fetchedHolidays: HolidayItem[] = [];
@@ -207,42 +205,41 @@ export default function App() {
       Object.keys(holidayData).forEach(key => {
         const detail = holidayData[key];
         fetchedHolidays.push({
-          date: detail.date, // e.g. "2026-01-01"
-          isHoliday: detail.holiday, // true=放假, false=补班
-          name: detail.name || "节假日",
+          date: detail.date,
+          isHoliday: detail.holiday,
+          name: translateHolidayName(detail.name || "Holiday"),
         });
       });
 
       if (fetchedHolidays.length === 0) {
-        throw new Error("抓取到的节假日列表数据为空，可能是本年尚未公布或数据源尚未收录！");
+        throw new Error("Fetched holiday list is empty. The data source might not have published holidays for this year yet.");
       }
 
-      // 合并到本地：保留非此年份的已有非自定义数据
+      // Merge locally: retain existing non-customized data for other years
       setHolidays(currentLocal => {
         const filteredCurrent = currentLocal.filter(item => {
           const itemYear = Number(item.date.split("-")[0]);
-          return itemYear !== selectedYear; // 过滤掉本年旧数据
+          return itemYear !== selectedYear; // Filter out old data for this year
         });
         return [...filteredCurrent, ...fetchedHolidays];
       });
 
-      const nowStr = new Date().toLocaleString("zh-CN");
+      const nowStr = new Date().toLocaleString("en-US");
       setSyncTime(nowStr);
       localStorage.setItem("holidays_sync_time", nowStr);
     } catch (err: any) {
       console.error("Sync Error:", err);
-      setSyncError(err?.message || "网络请求失败，请确保网络通畅后重试。");
+      setSyncError(err?.message || "Network request failed. Please check your internet connection and try again.");
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // 判断是否已含有自定义修改
   const hasOverrides = Object.keys(customOverrides).length > 0;
 
   return (
     <div id="main-root-container" className="min-h-screen bg-slate-50/70 dark:bg-slate-950 text-gray-800 dark:text-slate-200 font-sans tracking-tight pb-16 antialiased">
-      {/* 顶部通栏导航 */}
+      {/* Top Navigation */}
       <header id="top-portal-header" className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800/80 z-30 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -251,22 +248,22 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-base font-bold text-gray-900 dark:text-slate-100 tracking-tight flex items-center gap-1.5 leading-none">
-                工作进度
+                Work Progress
               </h1>
               <p className="text-[10px] text-gray-400 dark:text-slate-500 font-medium leading-none mt-1">
-                剔除法定节假日 · 调休智能补偿 · 精确度万分之一
+                Exclude Holidays • Auto Adjust Overrides • Precision to 0.0001%
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* 顶栏北京实时时间看板 */}
+            {/* Beijing Time Display */}
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100/80 dark:border-slate-800 rounded-xl">
               <Clock size={13} className="text-gray-400 dark:text-slate-500" />
               <div className="flex flex-col text-left">
                 <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 leading-none">BEIJING TIME</span>
                 <span className="text-xs font-semibold text-gray-700 dark:text-slate-300 font-mono mt-0.5 leading-none">
-                  {currentTime.toLocaleTimeString("zh-CN", { hour12: false })}
+                  {currentTime.toLocaleTimeString("en-US", { hour12: false })}
                 </span>
               </div>
             </div>
@@ -274,14 +271,14 @@ export default function App() {
         </div>
       </header>
 
-      {/* 主页面宽度局约束 */}
+      {/* Main Layout Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {/* 顶部高精度主图表/进度指示器 */}
+        {/* Main Progress Indicator */}
         <ProgressBar
           progress={progressOfSelectedMonth}
         />
 
-        {/* 下方排班明细日历 */}
+        {/* Calendar Grid */}
         <CalendarGrid
           days={daysOfSelectedMonth}
           onToggleDay={handleToggleDay}

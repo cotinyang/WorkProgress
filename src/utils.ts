@@ -13,9 +13,68 @@ export function formatDateStr(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+// Translate holiday/workday names from Chinese to English dynamically (useful for external APIs)
+export function translateHolidayName(name: string): string {
+  if (!name) return "";
+  
+  const directMap: Record<string, string> = {
+    "元旦": "New Year's Day",
+    "除夕": "Lunar New Year's Eve",
+    "春节": "Spring Festival",
+    "清明节": "Tomb-Sweeping Day",
+    "劳动节": "Labor Day",
+    "端午节": "Dragon Boat Festival",
+    "中秋节": "Mid-Autumn Festival",
+    "国庆节": "National Day",
+    "周末": "Weekend",
+    "工作日": "Workday",
+    "初一": "Lunar New Year (Day 1)",
+    "初二": "Lunar New Year (Day 2)",
+    "初三": "Lunar New Year (Day 3)",
+    "初四": "Lunar New Year (Day 4)",
+    "初五": "Lunar New Year (Day 5)",
+    "初六": "Lunar New Year (Day 6)",
+    "初七": "Lunar New Year (Day 7)",
+    "初八": "Lunar New Year (Day 8)",
+    "初九": "Lunar New Year (Day 9)",
+    "初十": "Lunar New Year (Day 10)",
+    "手动调休休": "Custom Leave",
+    "手动调休班": "Custom Workday",
+    "自定义休": "Custom Leave",
+    "调班上班": "Adj. Workday",
+    "调休班": "Adj. Workday",
+    "国配休": "Official Holiday",
+    "周末休息": "Weekend",
+    "节假日": "Holiday"
+  };
+
+  if (directMap[name]) {
+    return directMap[name];
+  }
+
+  let englishName = name;
+  if (englishName.includes("元旦")) englishName = englishName.replace("元旦", "New Year's");
+  if (englishName.includes("春节")) englishName = englishName.replace("春节", "Spring Festival");
+  if (englishName.includes("清明")) englishName = englishName.replace("清明", "Tomb-Sweeping Day");
+  if (englishName.includes("劳动节")) englishName = englishName.replace("劳动节", "Labor Day");
+  if (englishName.includes("端午")) englishName = englishName.replace("端午", "Dragon Boat Festival");
+  if (englishName.includes("中秋")) englishName = englishName.replace("中秋", "Mid-Autumn");
+  if (englishName.includes("国庆")) englishName = englishName.replace("国庆", "National Day");
+  
+  if (englishName.includes("前补班")) {
+    englishName = englishName.replace("前补班", " Adj. Workday (Pre)");
+  } else if (englishName.includes("后补班")) {
+    englishName = englishName.replace("后补班", " Adj. Workday (Post)");
+  } else if (englishName.includes("补班")) {
+    englishName = englishName.replace("补班", " Adj. Workday");
+  }
+
+  return englishName;
+}
+
 // 获取某一天的周几名称
 export function getDayOfWeekName(dayOfWeek: number): string {
-  const names = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+  const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   return names[dayOfWeek];
 }
 
@@ -45,13 +104,13 @@ export function generateMonthDays(
 
     let isWorkday = !isWeekend; // 默认：周一至周五上班
     let isHoliday = isWeekend;  // 默认：周末休息
-    let name = isWeekend ? "周末" : "工作日";
+    let name = isWeekend ? "Weekend" : "Workday";
     let isCustom = false;
 
     if (holidayMatch) {
       isHoliday = holidayMatch.isHoliday;
       isWorkday = !holidayMatch.isHoliday;
-      name = holidayMatch.name;
+      name = translateHolidayName(holidayMatch.name);
       isCustom = !!holidayMatch.isCustom;
     }
 
